@@ -1,12 +1,12 @@
-import { readdir } from "node:fs/promises";
 import path from "node:path";
+import { access } from "node:fs/promises";
 import { describe, expect, test } from "vitest";
 import {
   localArticles,
   validateLocalArticleManifest,
 } from "../../scripts/import-csdn/local-articles";
 
-const sourceDir = "C:\\ShawnL_Wiki\\csdn";
+const contentDir = path.resolve("src/content/articles");
 
 describe("localArticles", () => {
   test("包含 18 个唯一且完整的文章记录", () => {
@@ -17,17 +17,12 @@ describe("localArticles", () => {
     expect(validateLocalArticleManifest(localArticles)).toEqual([]);
   });
 
-  test("元数据清单与本地 Markdown 文件一一对应", async () => {
-    const entries = await readdir(sourceDir, { withFileTypes: true });
-    const sourceFiles = entries
-      .filter((entry) => entry.isFile() && path.extname(entry.name) === ".md")
-      .map((entry) => entry.name)
-      .sort();
-    const manifestFiles = localArticles
-      .map((article) => article.filename)
-      .sort();
-
-    expect(manifestFiles).toEqual(sourceFiles);
+  test("清单中的每篇文章都已生成仓库内容文件", async () => {
+    for (const article of localArticles) {
+      await expect(
+        access(path.join(contentDir, `${article.slug}.md`)),
+      ).resolves.toBeUndefined();
+    }
   });
 
   test("未命名文章使用正文对应的正式标题和原始文章信息", () => {
