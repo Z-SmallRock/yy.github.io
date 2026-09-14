@@ -162,6 +162,15 @@ textarea {
   margin: 0;
 }
 
+.site-footer__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  margin-top: 0.4rem !important;
+  font-size: 0.82rem;
+  color: var(--mist);
+}
+
 .ink-hero {
   position: relative;
   width: 100%;

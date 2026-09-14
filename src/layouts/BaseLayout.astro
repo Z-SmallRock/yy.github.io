@@ -34,9 +34,20 @@ const currentPath = Astro.url.pathname;
     </main>
     <footer class="site-footer">
       <p>十六 · 软件工程师</p>
+      <p class="site-footer__stats" aria-label="网站访问统计">
+        <span>
+          本站访问量：<span id="busuanzi_site_pv">统计加载中</span> 次
+        </span>
+        <span aria-hidden="true">·</span>
+        <span>
+          累计访客：<span id="busuanzi_site_uv">统计加载中</span> 人
+        </span>
+      </p>
     </footer>
   </body>
 </html>
+
+<script is:inline defer src="https://busuanzi.9420.ltd/js"></script>
 
 <style is:global>
   @import "../styles/global.css";

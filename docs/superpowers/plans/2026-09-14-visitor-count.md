@@ -4,7 +4,7 @@
 
 **Goal:** Add public site-wide visitor and page-view counters to the static GitHub Pages site footer.
 
-**Architecture:** Keep the site fully static and load the Busuanzi client asynchronously from the global Astro layout. Render stable counter elements in the footer with loading text, allowing the external script to fill in site-wide PV and UV values without adding a backend or build-time state.
+**Architecture:** Keep the site fully static and load the Busuanzi client as an explicit inline external script with `defer` from the global Astro layout. Render stable counter elements in the footer with loading text, allowing the external script to fill in site-wide PV and UV values without adding a backend or build-time state.
 
 **Tech Stack:** Astro 5, TypeScript, Vitest, CSS, Busuanzi browser script.
 
@@ -26,7 +26,7 @@
 
 **Interfaces:**
 - The test reads the global layout as text and verifies the public markup contract used by the external counter script.
-- The implementation in Task 2 must provide the exact IDs `busuanzi_value_site_pv` and `busuanzi_value_site_uv`.
+- The implementation in Task 2 must provide the exact IDs `busuanzi_site_pv` and `busuanzi_site_uv`.
 
 - [ ] **Step 1: Extend the test fixture paths**
 
@@ -45,10 +45,10 @@ test("全局页脚包含异步访问统计和 PV/UV 计数节点", async () => {
   const layout = await readFile(layoutPath, "utf8");
 
   expect(layout).toMatch(
-    /<script\s+async\s+src="https:\/\/busuanzi\.9420\.ltd\/js"><\/script>/,
+    /<script\s+is:inline\s+defer\s+src="https:\/\/busuanzi\.9420\.ltd\/js"><\/script>/,
   );
-  expect(layout).toContain('id="busuanzi_value_site_pv"');
-  expect(layout).toContain('id="busuanzi_value_site_uv"');
+  expect(layout).toContain('id="busuanzi_site_pv"');
+  expect(layout).toContain('id="busuanzi_site_uv"');
   expect(layout).toContain("本站访问量");
   expect(layout).toContain("累计访客");
 });
@@ -75,7 +75,7 @@ Expected result before implementation: the existing layout test passes, and the 
 
 **Interfaces:**
 - `BaseLayout.astro` produces the footer markup shared by every page.
-- The external script fills `#busuanzi_value_site_pv` and `#busuanzi_value_site_uv`.
+- The external script fills `#busuanzi_site_pv` and `#busuanzi_site_uv`.
 - `.site-footer__stats` is the stable styling hook for the statistics row.
 
 - [ ] **Step 1: Add the footer counters**
@@ -86,16 +86,16 @@ Update the footer in `src/layouts/BaseLayout.astro` to:
 <footer class="site-footer">
   <p>十六 · 软件工程师</p>
   <p class="site-footer__stats" aria-label="网站访问统计">
-    <span id="busuanzi_container_site_pv">
-      本站访问量：<span id="busuanzi_value_site_pv">统计加载中</span> 次
+    <span>
+      本站访问量：<span id="busuanzi_site_pv">统计加载中</span> 次
     </span>
     <span aria-hidden="true">·</span>
-    <span id="busuanzi_container_site_uv">
-      累计访客：<span id="busuanzi_value_site_uv">统计加载中</span> 人
+    <span>
+      累计访客：<span id="busuanzi_site_uv">统计加载中</span> 人
     </span>
   </p>
 </footer>
-<script async src="https://busuanzi.9420.ltd/js"></script>
+<script is:inline defer src="https://busuanzi.9420.ltd/js"></script>
 ```
 
 The script belongs after the page markup so it is non-blocking and is emitted once by the global layout.
