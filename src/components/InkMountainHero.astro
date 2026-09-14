@@ -1,0 +1,26 @@
+---
+const base = import.meta.env.BASE_URL;
+const actionHref = `${base}articles`;
+const heroSrc = `${base}images/hero/ink-mountain.webp`;
+---
+
+<section class="ink-hero" aria-labelledby="hero-title">
+  <img
+    class="ink-hero__image"
+    src={heroSrc}
+    alt=""
+    width="2400"
+    height="1200"
+    loading="eager"
+    fetchpriority="high"
+  />
+  <div class="ink-hero__content">
+    <h1 id="hero-title" class="ink-hero__title">十六</h1>
+    <p class="ink-hero__subtitle">软件工程师</p>
+    <p class="ink-hero__statement">公开技术文章的本地化归档。</p>
+    <a class="primary-action" href={actionHref}>
+      查看文章
+      <span class="primary-action__arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>

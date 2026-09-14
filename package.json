@@ -1,0 +1,34 @@
+{
+  "name": "shiliu-personal-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "postbuild": "tsx scripts/content-gate.ts",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "import:csdn": "tsx scripts/import-csdn/cli.ts",
+    "import:local": "tsx scripts/import-csdn/import-local.ts"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.0",
+    "astro": "^5.13.0",
+    "cheerio": "^1.2.0",
+    "gray-matter": "^4.0.3",
+    "sharp": "^0.35.4",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^24.3.0",
+    "@types/turndown": "^5.0.6",
+    "mdast-util-from-markdown": "^2.0.3",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

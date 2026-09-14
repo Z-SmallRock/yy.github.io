@@ -1,0 +1,43 @@
+---
+import SiteHeader from "../components/SiteHeader.astro";
+import ReducedMotionNotice from "../components/ReducedMotionNotice.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "十六",
+  description = "十六：软件工程师",
+} = Astro.props;
+
+const documentTitle = title === "十六" ? "十六" : `${title} | 十六`;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{documentTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <ReducedMotionNotice />
+    <SiteHeader currentPath={currentPath} />
+    <main id="main" class="main-content">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>十六 · 软件工程师</p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  @import "../styles/global.css";
+</style>

@@ -1,0 +1,35 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleList from "../../components/ArticleList.astro";
+import { filterAndSortArticles, type ArticleItem } from "../../lib/articles";
+
+const articles = (await getCollection("articles")).map(
+  (article): ArticleItem => ({
+    slug: article.data.slug,
+    title: article.data.title,
+    summary: article.data.summary,
+    category: article.data.category,
+    publishedAt: article.data.publishedAt.toISOString().slice(0, 10),
+    readingTime: article.data.readingTime,
+  }),
+);
+
+const sorted = filterAndSortArticles(articles, {
+  query: "",
+  category: "",
+  sort: "newest",
+});
+---
+
+<BaseLayout
+  title="文章"
+  description="十六的技术文章目录"
+>
+  <section class="page-heading">
+    <h1>文章</h1>
+    <p>按日期整理的技术文章目录，支持本地搜索与分类筛选。</p>
+  </section>
+
+  <ArticleList articles={sorted} />
+</BaseLayout>

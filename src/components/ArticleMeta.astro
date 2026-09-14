@@ -1,0 +1,26 @@
+---
+interface Props {
+  publishedAt: string;
+  category: string;
+  readingTime: number;
+  updatedAt?: string;
+}
+
+const { publishedAt, category, readingTime, updatedAt } = Astro.props;
+---
+
+<p class="article-meta">
+  <time datetime={publishedAt}>{publishedAt.slice(0, 10)}</time>
+  {
+    updatedAt ? (
+      <>
+        <span aria-hidden="true"> · </span>
+        <span>更新于 <time datetime={updatedAt}>{updatedAt.slice(0, 10)}</time></span>
+      </>
+    ) : null
+  }
+  <span aria-hidden="true"> · </span>
+  <span class="article-meta__category">{category}</span>
+  <span aria-hidden="true"> · </span>
+  <span>约 {readingTime} 分钟</span>
+</p>
