@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.astro/
+.npm-cache/
+outputs/
+work/
+.codemap/
+.codex/
+.agents/
+
+# Local editor and operating-system metadata
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Local environment files
+.env
+.env.*
+!.env.example

@@ -1,0 +1,35 @@
+---
+import ArticleMeta from "./ArticleMeta.astro";
+import type { ArticleItem } from "../lib/articles";
+
+interface Props {
+  article: ArticleItem;
+  headingLevel?: 2 | 3;
+}
+
+const { article, headingLevel = 2 } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const articleHref = `${base}articles/${article.slug}/`;
+---
+
+<li class="article-card">
+  <article class="article-entry">
+    {
+      headingLevel === 2 ? (
+        <h2 class="article-entry__title">
+          <a href={articleHref}>{article.title}</a>
+        </h2>
+      ) : (
+        <h3 class="article-entry__title">
+          <a href={articleHref}>{article.title}</a>
+        </h3>
+      )
+    }
+    <ArticleMeta
+      publishedAt={article.publishedAt}
+      category={article.category}
+      readingTime={article.readingTime}
+    />
+    <p class="article-entry__summary">{article.summary}</p>
+  </article>
+</li>

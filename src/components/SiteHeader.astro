@@ -1,0 +1,47 @@
+---
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = "" } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+const navItems = [
+  { label: "首页", path: "" },
+  { label: "文章", path: "articles" },
+  { label: "关于", path: "about" },
+];
+
+const href = (path: string) => {
+  const joined = path === "" ? base : `${base}${path}`;
+  return joined === "" ? "/" : joined;
+};
+
+const isActive = (path: string) => {
+  const current = currentPath === "" ? "/" : currentPath.replace(/\/+$/, "/");
+  const target = href(path).replace(/\/+$/, "/");
+
+  if (path === "") {
+    return current === base || current === "/";
+  }
+
+  return current === target || current.startsWith(`${target}/`);
+};
+---
+
+<header class="site-header">
+  <a class="site-name" href={href("")}>十六</a>
+  <nav class="site-nav" aria-label="站点导航">
+    {
+      navItems.map((item) => (
+        <a
+          class:list={["site-nav__link", { "is-active": isActive(item.path) }]}
+          href={href(item.path)}
+          aria-current={isActive(item.path) ? "page" : undefined}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+</header>

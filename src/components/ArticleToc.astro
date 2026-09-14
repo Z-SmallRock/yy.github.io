@@ -1,0 +1,40 @@
+---
+import type { TocEntry } from "../lib/articles";
+
+interface Props {
+  headings: TocEntry[];
+}
+
+const { headings } = Astro.props;
+---
+
+{
+  headings.length > 0 ? (
+    <nav class="article-toc" aria-label="文章目录">
+      <details class="article-toc__mobile">
+        <summary>目录</summary>
+        <ol class="article-toc__list">
+          {
+            headings.map((heading) => (
+              <li class:list={[`article-toc__item article-toc__item--level-${heading.level}`]}>
+                <a href={`#${heading.id}`}>{heading.text}</a>
+              </li>
+            ))
+          }
+        </ol>
+      </details>
+      <div class="article-toc__desktop">
+        <p class="article-toc__label">目录</p>
+        <ol class="article-toc__list">
+          {
+            headings.map((heading) => (
+              <li class:list={[`article-toc__item article-toc__item--level-${heading.level}`]}>
+                <a href={`#${heading.id}`}>{heading.text}</a>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </nav>
+  ) : null
+}

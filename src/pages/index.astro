@@ -1,0 +1,80 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import InkMountainHero from "../components/InkMountainHero.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import { filterAndSortArticles, type ArticleItem } from "../lib/articles";
+
+const base = import.meta.env.BASE_URL;
+const directions = ["C++", "Qt", "Electron", "Linux", "MySQL", "Node.js", "Boost"];
+
+const articles = (await getCollection("articles")).map(
+  (article): ArticleItem => ({
+    slug: article.data.slug,
+    title: article.data.title,
+    summary: article.data.summary,
+    category: article.data.category,
+    publishedAt: article.data.publishedAt.toISOString().slice(0, 10),
+    readingTime: article.data.readingTime,
+  }),
+);
+
+const newest = filterAndSortArticles(articles, {
+  query: "",
+  category: "",
+  sort: "newest",
+});
+const selected = newest.slice(0, 3);
+const recent = newest.slice(3, 9);
+---
+
+<BaseLayout>
+  <InkMountainHero />
+
+  <section class="home-section">
+    <h2>技术方向</h2>
+    <ul class="direction-list">
+      {directions.map((direction) => <li class="direction-tag">{direction}</li>)}
+    </ul>
+  </section>
+
+  <section class="home-section">
+    <h2>关于本站</h2>
+    <p class="statement-copy">
+      这里以本地静态页面收录十六的公开技术文章，聚焦工程开发实践。站点不虚构个人履历、联系方式或社交资料。
+    </p>
+  </section>
+
+  <section class="home-section">
+    <div class="home-section__head">
+      <h2>精选文章</h2>
+      <a class="section-link" href={`${base}articles`}>查看全部 <span aria-hidden="true">→</span></a>
+    </div>
+    {
+      selected.length === 0 ? (
+        <p class="empty-state">文章内容迁移完成后将在此展示。</p>
+      ) : (
+        <ol class="article-list">
+          {selected.map((article) => (
+            <ArticleCard article={article} headingLevel={3} />
+          ))}
+        </ol>
+      )
+    }
+  </section>
+
+  <section class="home-section">
+    <h2>最近文章</h2>
+    {
+      recent.length === 0 ? (
+        <p class="empty-state">暂无更多文章。</p>
+      ) : (
+        <ol class="article-list">
+          {recent.map((article) => (
+            <ArticleCard article={article} headingLevel={3} />
+          ))}
+        </ol>
+      )
+    }
+  </section>
+</BaseLayout>

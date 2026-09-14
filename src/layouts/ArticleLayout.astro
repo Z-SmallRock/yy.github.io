@@ -1,0 +1,46 @@
+---
+import ArticleMeta from "../components/ArticleMeta.astro";
+import ArticleToc from "../components/ArticleToc.astro";
+import type { TocEntry } from "../lib/articles";
+
+interface Props {
+  title: string;
+  description: string;
+  category: string;
+  publishedAt: string;
+  updatedAt?: string;
+  readingTime: number;
+  headings: TocEntry[];
+}
+
+const {
+  title,
+  description,
+  category,
+  publishedAt,
+  updatedAt,
+  readingTime,
+  headings,
+} = Astro.props;
+---
+
+<article class="article-shell">
+  <header class="article-header">
+    <p class="article-kicker">{category}</p>
+    <h1 class="article-title">{title}</h1>
+    <p class="article-lede">{description}</p>
+    <ArticleMeta
+      publishedAt={publishedAt}
+      updatedAt={updatedAt}
+      category={category}
+      readingTime={readingTime}
+    />
+  </header>
+
+  <div class="article-layout">
+    <ArticleToc headings={headings} />
+    <div class="article-body prose">
+      <slot />
+    </div>
+  </div>
+</article>
