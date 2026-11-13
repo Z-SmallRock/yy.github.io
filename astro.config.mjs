@@ -14,6 +14,13 @@ function prefixPublicImageUrls() {
       ) {
         node.url = prefixBasePath(basePath, node.url);
       }
+      if (
+        node.type === "link" &&
+        typeof node.url === "string" &&
+        /^\/(articles|about)(\/|$)/.test(node.url)
+      ) {
+        node.url = prefixBasePath(basePath, node.url);
+      }
       for (const child of node.children ?? []) {
         visit(child);
       }
@@ -25,6 +32,7 @@ function prefixPublicImageUrls() {
 export default defineConfig({
   integrations: [mdx()],
   markdown: {
+    shikiConfig: { theme: "github-dark-default", wrap: false },
     remarkPlugins: [prefixPublicImageUrls],
   },
   site: process.env.SITE_URL || undefined,

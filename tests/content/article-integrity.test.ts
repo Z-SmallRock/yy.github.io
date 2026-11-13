@@ -1,4 +1,4 @@
-﻿import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import { describe, expect, test } from "vitest";
@@ -44,9 +44,9 @@ async function listArticleFiles(): Promise<string[]> {
 }
 
 describe("文章内容完整性", () => {
-  test("站点精确包含 19 篇文章", async () => {
+  test("站点精确包含 23 篇文章", async () => {
     const files = await listArticleFiles();
-    expect(files).toHaveLength(19);
+    expect(files).toHaveLength(23);
   });
 
   test("每篇文章的元数据、正文与文件名均满足发布约束", async () => {
@@ -108,7 +108,7 @@ describe("文章内容完整性", () => {
       sourceIds.push(sourceId);
     }
 
-    expect(new Set(sourceIds).size).toBe(19);
-    expect(new Set(slugs).size).toBe(19);
+    expect(new Set(sourceIds).size).toBe(23);
+    expect(new Set(slugs).size).toBe(23);
   });
 });

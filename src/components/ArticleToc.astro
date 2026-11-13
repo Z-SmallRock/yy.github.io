@@ -12,29 +12,72 @@ const { headings } = Astro.props;
   headings.length > 0 ? (
     <nav class="article-toc" aria-label="文章目录">
       <details class="article-toc__mobile">
-        <summary>目录</summary>
+        <summary>目录 / contents</summary>
         <ol class="article-toc__list">
-          {
-            headings.map((heading) => (
-              <li class:list={[`article-toc__item article-toc__item--level-${heading.level}`]}>
-                <a href={`#${heading.id}`}>{heading.text}</a>
-              </li>
-            ))
-          }
+          {headings.map((heading) => (
+            <li class:list={[`article-toc__item article-toc__item--level-${heading.level}`]}>
+              <a href={`#${heading.id}`}>{heading.text}</a>
+            </li>
+          ))}
         </ol>
       </details>
       <div class="article-toc__desktop">
-        <p class="article-toc__label">目录</p>
+        <p class="article-toc__label">contents</p>
         <ol class="article-toc__list">
-          {
-            headings.map((heading) => (
-              <li class:list={[`article-toc__item article-toc__item--level-${heading.level}`]}>
-                <a href={`#${heading.id}`}>{heading.text}</a>
-              </li>
-            ))
-          }
+          {headings.map((heading) => (
+            <li class:list={[`article-toc__item article-toc__item--level-${heading.level}`]}>
+              <a href={`#${heading.id}`}>{heading.text}</a>
+            </li>
+          ))}
         </ol>
       </div>
     </nav>
   ) : null
 }
+
+<script>
+  const links = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>(".article-toc__list a"),
+  );
+
+  if (links.length > 0) {
+    const headings = links
+      .map((link) => {
+        const id = link.getAttribute("href")?.slice(1) ?? "";
+        return id ? document.getElementById(id) : null;
+      })
+      .filter((heading): heading is HTMLElement => heading !== null);
+
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const line = window.innerHeight * 0.3;
+      let active = headings[0]?.id ?? "";
+
+      for (const heading of headings) {
+        if (heading.getBoundingClientRect().top <= line) {
+          active = heading.id;
+        }
+      }
+
+      for (const link of links) {
+        link.classList.toggle(
+          "is-active",
+          link.getAttribute("href") === `#${active}`,
+        );
+      }
+    };
+
+    const onScroll = () => {
+      if (ticking) {
+        return;
+      }
+      ticking = true;
+      window.requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    update();
+  }
+</script>

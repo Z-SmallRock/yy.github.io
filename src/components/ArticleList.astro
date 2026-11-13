@@ -13,24 +13,24 @@ const base = import.meta.env.BASE_URL;
 
 <div class="article-directory" data-articles={JSON.stringify(articles)} data-base={base}>
   <form class="article-controls" role="search" onsubmit="return false">
-    <label class="article-control">
-      <span>搜索</span>
+    <label class="article-control article-control--search">
+      <span>搜索 / search</span>
       <input
         id="article-search"
         type="search"
-        placeholder="搜索标题、摘要或分类"
+        placeholder="标题、摘要或分类…"
         autocomplete="off"
       />
     </label>
     <label class="article-control">
-      <span>分类</span>
+      <span>分类 / category</span>
       <select id="article-category">
         <option value="">全部分类</option>
         {categories.map((category) => <option value={category}>{category}</option>)}
       </select>
     </label>
     <label class="article-control">
-      <span>排序</span>
+      <span>排序 / sort</span>
       <select id="article-sort">
         <option value="newest">最新优先</option>
         <option value="oldest">最早优先</option>
@@ -40,17 +40,20 @@ const base = import.meta.env.BASE_URL;
     </label>
   </form>
 
-  <p class="article-result-count" aria-live="polite">
-    <span id="article-result-count">共 {articles.length} 篇</span>
-  </p>
+  <div class="article-status">
+    <p class="article-result-count" aria-live="polite">
+      <span id="article-result-count">共 {articles.length} 篇</span>
+    </p>
+    <p class="article-hint">按 <kbd>/</kbd> 聚焦搜索</p>
+  </div>
 
   <div id="article-empty" class="empty-state" hidden={articles.length > 0}>
     没有符合条件的文章。
   </div>
 
-  <ol class="article-list" id="article-list">
-    {articles.map((article) => (
-      <ArticleCard article={article} headingLevel={2} />
+  <ol class="post-grid" id="article-list">
+    {articles.map((article, index) => (
+      <ArticleCard article={article} headingLevel={2} index={index} />
     ))}
   </ol>
 </div>
@@ -61,6 +64,7 @@ const base = import.meta.env.BASE_URL;
     type ArticleItem,
     type SortOrder,
   } from "../lib/articles";
+  import { categoryHue } from "../lib/category-color";
 
   const root = document.querySelector<HTMLElement>(".article-directory")!;
   const articles = JSON.parse(root.dataset.articles ?? "[]") as ArticleItem[];
@@ -84,6 +88,21 @@ const base = import.meta.env.BASE_URL;
       return entities[character] ?? character;
     });
 
+  const params = new URLSearchParams(window.location.search);
+  const initialCategory = params.get("category") ?? "";
+  const initialQuery = params.get("q") ?? "";
+
+  if (
+    initialCategory &&
+    [...category.options].some((option) => option.value === initialCategory)
+  ) {
+    category.value = initialCategory;
+  }
+
+  if (initialQuery) {
+    search.value = initialQuery;
+  }
+
   function render() {
     const filtered = filterAndSortArticles(articles, {
       query: search.value,
@@ -95,21 +114,21 @@ const base = import.meta.env.BASE_URL;
     empty.hidden = filtered.length > 0;
     list.innerHTML = filtered
       .map(
-        (article) => `
-          <li class="article-card">
-            <article class="article-entry">
-              <h2 class="article-entry__title">
-                <a href="${base}articles/${escapeHtml(article.slug)}/">${escapeHtml(article.title)}</a>
-              </h2>
-              <p class="article-meta">
-                <time datetime="${escapeHtml(article.publishedAt)}">${escapeHtml(article.publishedAt.slice(0, 10))}</time>
-                <span aria-hidden="true"> · </span>
-                <span class="article-meta__category">${escapeHtml(article.category)}</span>
-                <span aria-hidden="true"> · </span>
-                <span>约 ${article.readingTime} 分钟</span>
-              </p>
-              <p class="article-entry__summary">${escapeHtml(article.summary)}</p>
-            </article>
+        (article, index) => `
+          <li class="post">
+            <a class="post__link" href="${base}articles/${escapeHtml(article.slug)}/">
+              <span class="post__index" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
+              <div class="post__main">
+                <h2 class="post__title">${escapeHtml(article.title)}</h2>
+                <p class="post__summary">${escapeHtml(article.summary)}</p>
+              </div>
+              <div class="post__meta">
+                <span class="post__cat" style="--cat-hue: ${categoryHue(article.category)}">${escapeHtml(article.category)}</span>
+                <time class="post__date" datetime="${escapeHtml(article.publishedAt)}">${escapeHtml(article.publishedAt)}</time>
+                <span class="post__read">${article.readingTime} min</span>
+              </div>
+              <span class="post__arrow" aria-hidden="true">→</span>
+            </a>
           </li>
         `,
       )
@@ -119,5 +138,22 @@ const base = import.meta.env.BASE_URL;
   search.addEventListener("input", render);
   category.addEventListener("change", render);
   sort.addEventListener("change", render);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) {
+      return;
+    }
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLInputElement ||
+      active instanceof HTMLTextAreaElement ||
+      active instanceof HTMLSelectElement
+    ) {
+      return;
+    }
+    event.preventDefault();
+    search.focus();
+  });
+
   render();
 </script>

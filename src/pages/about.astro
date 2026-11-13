@@ -1,24 +1,40 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const directions = ["C++", "Qt", "Electron", "Linux", "MySQL", "Node.js", "Boost"];
+const total = (await getCollection("articles")).length;
 ---
 
 <BaseLayout title="关于" description="关于十六的站点说明">
   <section class="page-heading">
+    <p class="eyebrow">// about</p>
     <h1>关于</h1>
-    <p class="role">软件工程师</p>
-  </section>
-  <section class="prose about-copy">
-    <h2>站点说明</h2>
-    <p>
-      本站收录十六在工程开发方向上的公开技术文章，以本地静态页面呈现，可在构建后离线部署。
-    </p>
-    <p>
-      尚未提供的个人履历、联系方式与社交资料不会被虚构展示。
+    <p class="role">
+      软件工程师 · <span class="mono">C++ / Qt / Electron</span>
     </p>
   </section>
-  <ul class="direction-list about-directions">
-    {directions.map((direction) => <li class="direction-tag">{direction}</li>)}
-  </ul>
+
+  <section class="about-copy">
+    <div class="about-grid">
+      <article class="panel">
+        <h2>站点说明</h2>
+        <p>
+          本站收录十六在工程开发方向上的公开技术文章，以本地静态页面呈现，可在构建后离线部署。
+        </p>
+        <p>尚未提供的个人履历、联系方式与社交资料不会被虚构展示。</p>
+      </article>
+      <article class="panel">
+        <h2>技术栈</h2>
+        <ul class="stack-list">
+          {directions.map((direction) => <li>{direction}</li>)}
+        </ul>
+      </article>
+      <article class="panel">
+        <h2>站点信息</h2>
+        <p>当前收录 <span class="mono">{total}</span> 篇文章，按发布日期归档。</p>
+        <p class="mono">static · astro · github pages</p>
+      </article>
+    </div>
+  </section>
 </BaseLayout>

@@ -22,12 +22,12 @@ const sorted = filterAndSortArticles(articles, {
 });
 ---
 
-<BaseLayout
-  title="文章"
-  description="十六的技术文章目录"
->
+<BaseLayout title="文章" description="十六的技术文章目录：C++、Qt、Electron、Chromium 与系统底层实践。">
   <section class="page-heading">
-    <h1>文章</h1>
+    <p class="eyebrow">// archive</p>
+    <h1>
+      文章<span class="page-heading__count">{String(sorted.length).padStart(2, "0")}</span>
+    </h1>
     <p>按日期整理的技术文章目录，支持本地搜索与分类筛选。</p>
   </section>
 
