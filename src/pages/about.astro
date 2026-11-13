@@ -2,8 +2,17 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const directions = ["C++", "Qt", "Electron", "Linux", "MySQL", "Node.js", "Boost"];
-const total = (await getCollection("articles")).length;
+const base = import.meta.env.BASE_URL;
+const articles = await getCollection("articles");
+const total = articles.length;
+
+const counts = new Map<string, number>();
+for (const entry of articles) {
+  counts.set(entry.data.category, (counts.get(entry.data.category) ?? 0) + 1);
+}
+const topics = [...counts.entries()].sort(
+  ([nameA, countA], [nameB, countB]) => countB - countA || nameA.localeCompare(nameB),
+);
 ---
 
 <BaseLayout title="关于" description="关于十六的站点说明">
@@ -20,14 +29,20 @@ const total = (await getCollection("articles")).length;
       <article class="panel">
         <h2>站点说明</h2>
         <p>
-          本站收录十六在工程开发方向上的公开技术文章，以本地静态页面呈现，可在构建后离线部署。
+          平时做工程顺手记下的东西：C++、Qt、Electron 的问题排查，以及最近在整理的 EDA / OrCAD 笔记。
         </p>
-        <p>尚未提供的个人履历、联系方式与社交资料不会被虚构展示。</p>
+        <p>上班踩的坑，下班记下来。</p>
       </article>
       <article class="panel">
-        <h2>技术栈</h2>
+        <h2>技术分类</h2>
         <ul class="stack-list">
-          {directions.map((direction) => <li>{direction}</li>)}
+          {topics.map(([name, count]) => (
+            <li>
+              <a href={`${base}articles/?category=${encodeURIComponent(name)}`}>
+                {name}<span class="stack-list__count">{String(count).padStart(2, "0")}</span>
+              </a>
+            </li>
+          ))}
         </ul>
       </article>
       <article class="panel">
