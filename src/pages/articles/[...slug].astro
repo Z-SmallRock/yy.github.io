@@ -3,7 +3,12 @@ import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ArticleLayout from "../../layouts/ArticleLayout.astro";
-import { getTocEntries } from "../../lib/articles";
+import {
+  getTocEntries,
+  pickNeighbors,
+  pickRelated,
+  type ArticleItem,
+} from "../../lib/articles";
 
 interface Props {
   article: CollectionEntry<"articles">;
@@ -24,6 +29,18 @@ const publishedDate = article.data.publishedAt.toISOString().slice(0, 10);
 const updatedAt = article.data.updatedAt
   ? article.data.updatedAt.toISOString().slice(0, 10)
   : undefined;
+
+const allArticles = await getCollection("articles");
+const items: ArticleItem[] = allArticles.map((entry) => ({
+  slug: entry.data.slug,
+  title: entry.data.title,
+  summary: entry.data.summary,
+  category: entry.data.category,
+  publishedAt: entry.data.publishedAt.toISOString().slice(0, 10),
+  readingTime: entry.data.readingTime,
+}));
+const neighbors = pickNeighbors(items, article.data.slug);
+const related = pickRelated(items, article.data.slug, 3);
 ---
 
 <BaseLayout
@@ -38,6 +55,9 @@ const updatedAt = article.data.updatedAt
     updatedAt={updatedAt}
     readingTime={article.data.readingTime}
     headings={toc}
+    prev={neighbors.prev}
+    next={neighbors.next}
+    related={related}
   >
     <Content />
   </ArticleLayout>

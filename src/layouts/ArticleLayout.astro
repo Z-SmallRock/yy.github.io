@@ -1,7 +1,8 @@
 ---
 import ArticleMeta from "../components/ArticleMeta.astro";
 import ArticleToc from "../components/ArticleToc.astro";
-import type { TocEntry } from "../lib/articles";
+import { categoryTone } from "../lib/category-color";
+import type { ArticleItem, TocEntry } from "../lib/articles";
 
 interface Props {
   title: string;
@@ -11,6 +12,9 @@ interface Props {
   updatedAt?: string;
   readingTime: number;
   headings: TocEntry[];
+  prev?: ArticleItem;
+  next?: ArticleItem;
+  related?: ArticleItem[];
 }
 
 const {
@@ -21,6 +25,9 @@ const {
   updatedAt,
   readingTime,
   headings,
+  prev,
+  next,
+  related = [],
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
@@ -50,6 +57,54 @@ const base = import.meta.env.BASE_URL;
     <ArticleToc headings={headings} />
     <div class="article-body prose">
       <slot />
+
+      <footer class="article-tail">
+        {(prev || next) && (
+          <nav class="article-pager" aria-label="上一篇 / 下一篇">
+            {prev ? (
+              <a class="pager pager--prev" href={`${base}articles/${prev.slug}`}>
+                <span class="pager__label">← 上一篇 / prev</span>
+                <span class="pager__title">{prev.title}</span>
+                <span class="pager__meta">{prev.category} · {prev.readingTime} min</span>
+              </a>
+            ) : (
+              <span class="pager pager--empty" aria-hidden="true" />
+            )}
+            {next ? (
+              <a class="pager pager--next" href={`${base}articles/${next.slug}`}>
+                <span class="pager__label">下一篇 / next →</span>
+                <span class="pager__title">{next.title}</span>
+                <span class="pager__meta">{next.category} · {next.readingTime} min</span>
+              </a>
+            ) : (
+              <span class="pager pager--empty" aria-hidden="true" />
+            )}
+          </nav>
+        )}
+
+        {related.length > 0 && (
+          <section class="related" aria-labelledby="related-title">
+            <p class="related__label" id="related-title">// related articles</p>
+            <ul class="related__list">
+              {related.map((item) => (
+                <li>
+                  <a class="related__item" href={`${base}articles/${item.slug}`}>
+                    <span class="post__cat" data-tone={categoryTone(item.category)}>
+                      {item.category}
+                    </span>
+                    <span class="related__title">{item.title}</span>
+                    <span class="related__read">{item.readingTime} min</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <div class="article-tail__actions">
+          <a class="btn btn--ghost" href={`${base}articles`}>← 返回文章列表 / all articles</a>
+        </div>
+      </footer>
     </div>
   </div>
 </article>

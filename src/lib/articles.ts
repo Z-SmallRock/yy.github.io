@@ -82,3 +82,52 @@ export function getTocEntries(headings: readonly TocHeading[]): TocEntry[] {
       level: heading.depth,
     }));
 }
+
+export interface ArticleNeighbors {
+  prev?: ArticleItem;
+  next?: ArticleItem;
+}
+
+function sortByDate(items: readonly ArticleItem[], direction: 1 | -1): ArticleItem[] {
+  return items
+    .slice()
+    .sort(
+      (left, right) =>
+        direction * (normalizeDate(left.publishedAt) - normalizeDate(right.publishedAt)),
+    );
+}
+
+export function pickNeighbors(
+  items: readonly ArticleItem[],
+  slug: string,
+): ArticleNeighbors {
+  const ordered = sortByDate(items, 1);
+  const index = ordered.findIndex((item) => item.slug === slug);
+
+  if (index < 0) {
+    return {};
+  }
+
+  return { prev: ordered[index - 1], next: ordered[index + 1] };
+}
+
+export function pickRelated(
+  items: readonly ArticleItem[],
+  slug: string,
+  limit = 3,
+): ArticleItem[] {
+  const current = items.find((item) => item.slug === slug);
+  const pool = sortByDate(
+    items.filter((item) => item.slug !== slug),
+    -1,
+  );
+
+  if (!current) {
+    return pool.slice(0, limit);
+  }
+
+  const sameCategory = pool.filter((item) => item.category === current.category);
+  const others = pool.filter((item) => item.category !== current.category);
+
+  return [...sameCategory, ...others].slice(0, limit);
+}
