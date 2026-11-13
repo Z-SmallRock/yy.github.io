@@ -1,185 +1,190 @@
 ---
-import SiteHeader from "../components/SiteHeader.astro";
 import ReducedMotionNotice from "../components/ReducedMotionNotice.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 
 interface Props {
   title?: string;
   description?: string;
 }
 
-const {
-  title = "十六",
-  description = "十六：软件工程师，记录 C++、Qt、Electron 与系统底层的工程实践。",
-} = Astro.props;
-
-const documentTitle = title === "十六" ? "十六 · 软件工程师" : `${title} | 十六`;
-const currentPath = Astro.url.pathname;
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · 十六` : "十六 · 软件工程师";
+const metaDescription =
+  description ??
+  "十六：软件工程师。记录 C++、Qt、Electron、Chromium 与系统底层的工程实践。";
+const base = import.meta.env.BASE_URL;
 const year = new Date().getFullYear();
 ---
 
 <!doctype html>
 <html lang="zh-CN">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#080b0e" />
+    <meta name="theme-color" content="#141414" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={metaDescription} />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={documentTitle} />
-    <meta property="og:description" content={description} />
-    <title>{documentTitle}</title>
-    <script is:inline defer src="https://busuanzi.9420.ltd/js"></script>
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={Astro.url} />
+    <link rel="canonical" href={Astro.url} />
     <style is:global>
       @import "../styles/global.css";
     </style>
+    <script is:inline defer src="https://busuanzi.9420.ltd/js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#main">跳到主要内容</a>
+    <a class="skip-link" href="#main">跳到正文</a>
     <ReducedMotionNotice />
     <div class="read-progress" aria-hidden="true">
       <span class="read-progress__bar"></span>
     </div>
-    <SiteHeader currentPath={currentPath} />
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        <div class="ticker__group">
+          <span>十六 / blog</span>
+          <span>cpp · qt · electron · chromium</span>
+          <span>engineering notes</span>
+          <span>since 2018</span>
+          <span>十六 / blog</span>
+          <span>cpp · qt · electron · chromium</span>
+          <span>engineering notes</span>
+          <span>since 2018</span>
+        </div>
+        <div class="ticker__group">
+          <span>十六 / blog</span>
+          <span>cpp · qt · electron · chromium</span>
+          <span>engineering notes</span>
+          <span>since 2018</span>
+          <span>十六 / blog</span>
+          <span>cpp · qt · electron · chromium</span>
+          <span>engineering notes</span>
+          <span>since 2018</span>
+        </div>
+      </div>
+    </div>
+
+    <SiteHeader />
+
     <main id="main" class="main-content">
       <slot />
     </main>
+
     <footer class="site-footer">
       <div class="site-footer__inner">
         <div class="site-footer__brand">
-          <p class="site-footer__name">十六<span class="accent">.</span></p>
+          <span class="site-footer__name">十六 / blog</span>
           <p class="site-footer__note">
-            公开技术文章的本地化归档 · Built with Astro
+            工程笔记存档 · 静态构建 · 不追热点，只留能跑通的方法
           </p>
+          <span class="mono" style="font-size:10.5px;letter-spacing:.1em">
+            <a href={`${base}about`} style="border-bottom:2px solid var(--acid)">about</a>
+          </span>
         </div>
-        <div class="site-footer__traffic" data-traffic aria-label="网站访问统计">
-          <p class="traffic__head">
+
+        <div class="site-footer__traffic" data-traffic>
+          <div class="traffic__head">
             <span class="traffic__dot" aria-hidden="true"></span>
             site traffic
-            <span class="traffic__status">统计加载中</span>
-          </p>
+            <span class="traffic__status" aria-live="polite">统计加载中</span>
+          </div>
           <dl class="traffic__grid">
             <div class="traffic__item">
               <dt>本站访问量</dt>
               <dd>
-                <span class="traffic__value" id="busuanzi_site_pv">--</span>
-                <span class="traffic__unit">PV</span>
+                <span id="busuanzi_site_pv">--</span><span>PV</span>
               </dd>
             </div>
             <div class="traffic__item">
               <dt>累计访客</dt>
               <dd>
-                <span class="traffic__value" id="busuanzi_site_uv">--</span>
-                <span class="traffic__unit">UV</span>
+                <span id="busuanzi_site_uv">--</span><span>UV</span>
               </dd>
             </div>
           </dl>
-          <p class="traffic__note">数据由不蒜子提供，每次访问自动计数</p>
+          <p class="traffic__note">PV / UV 由 busuanzi 提供 · 仅统计站点访问</p>
         </div>
+
+        <p class="site-footer__legal">
+          © {year} 十六 · 工程笔记 · built with astro · hosted on github pages
+        </p>
       </div>
-      <p class="site-footer__legal">
-        © {year} 十六 · 内容未经许可请勿转载
-      </p>
     </footer>
 
     <script is:inline>
       (() => {
         const bar = document.querySelector(".read-progress__bar");
         if (!bar) return;
-
-        let ticking = false;
-
         const update = () => {
-          ticking = false;
-          const root = document.documentElement;
-          const max = root.scrollHeight - root.clientHeight;
-          const progress = max > 0 ? Math.min(1, root.scrollTop / max) : 0;
+          const doc = document.documentElement;
+          const max = doc.scrollHeight - window.innerHeight;
+          const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
           bar.style.transform = `scaleX(${progress})`;
         };
-
-        const onScroll = () => {
-          if (ticking) return;
-          ticking = true;
-          window.requestAnimationFrame(update);
-        };
-
-        window.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("resize", update, { passive: true });
+        window.addEventListener("scroll", update, { passive: true });
+        window.addEventListener("resize", update);
         update();
       })();
     </script>
 
     <script is:inline>
-      // 不蒜子统计加载后做数字滚动；超时给出可读的降级状态
       (() => {
+        const card = document.querySelector("[data-traffic]");
+        if (!card) return;
+        const status = card.querySelector(".traffic__status");
         const pvEl = document.getElementById("busuanzi_site_pv");
         const uvEl = document.getElementById("busuanzi_site_uv");
-        const heroEl = document.getElementById("hero_visitors");
-        const wrap = document.querySelector("[data-traffic]");
-        if (!pvEl || !uvEl) return;
-
+        const hero = document.getElementById("hero_visitors");
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const startedAt = performance.now();
-        const status = wrap ? wrap.querySelector(".traffic__status") : null;
 
-        const readNumber = (el) => {
-          const digits = (el.textContent || "").replace(/[^\d]/g, "");
-          return digits ? Number(digits) : null;
-        };
-        const write = (el, value) => {
-          if (el) el.textContent = String(value);
+        const readNumber = (element) => {
+          if (!element) return null;
+          const digits = (element.textContent || "").replace(/[^\d]/g, "");
+          const value = Number.parseInt(digits, 10);
+          return Number.isFinite(value) && value > 0 ? value : null;
         };
 
-        const animate = (el, to) => {
-          if (!el) return;
-          if (reduce || to < 10) {
-            write(el, to);
-            return;
-          }
+        const animate = (element, target) => {
           const duration = 900;
-          const t0 = performance.now();
+          const start = performance.now();
           const tick = (now) => {
-            const p = Math.min(1, (now - t0) / duration);
-            const eased = 1 - Math.pow(1 - p, 3);
-            write(el, Math.round(to * eased));
-            if (p < 1) window.requestAnimationFrame(tick);
-            else write(el, to);
+            const t = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - t, 3);
+            element.textContent = String(Math.round(target * eased));
+            if (t < 1) window.requestAnimationFrame(tick);
           };
           window.requestAnimationFrame(tick);
         };
 
-        const succeed = (pv, uv) => {
-          if (wrap) wrap.classList.add("is-live");
-          if (status) status.textContent = "live";
-          animate(pvEl, pv);
-          animate(uvEl, uv);
-          animate(heroEl, uv);
-        };
-
-        const fallback = () => {
-          if (wrap) wrap.classList.add("is-offline");
-          if (status) status.textContent = "统计服务暂不可用";
-          write(pvEl, "—");
-          write(uvEl, "—");
-          write(heroEl, "—");
-        };
-
-        const poll = () => {
+        const poll = window.setInterval(() => {
           const pv = readNumber(pvEl);
+          if (pv === null) return;
+          window.clearInterval(poll);
           const uv = readNumber(uvEl);
-          if (pv !== null && uv !== null) {
-            succeed(pv, uv);
-            return;
-          }
-          if (performance.now() - startedAt > 8000) {
-            fallback();
-            return;
-          }
-          window.setTimeout(poll, 250);
-        };
+          card.classList.add("is-live");
+          if (status) status.textContent = "live";
+          if (hero) hero.textContent = String(uv ?? pv);
 
-        poll();
+          if (reduce || pv < 10) {
+            pvEl.textContent = String(pv);
+            if (uvEl && uv !== null) uvEl.textContent = String(uv);
+            return;
+          }
+          animate(pvEl, pv);
+          if (uvEl && uv !== null) animate(uvEl, uv);
+        }, 250);
+
+        window.setTimeout(() => {
+          if (card.classList.contains("is-live")) return;
+          card.classList.add("is-offline");
+          if (status) status.textContent = "统计服务暂不可用";
+          if (pvEl) pvEl.textContent = "—";
+          if (uvEl) uvEl.textContent = "—";
+        }, 8000);
       })();
     </script>
   </body>

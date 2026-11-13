@@ -1,53 +1,44 @@
 ---
-interface Props {
-  currentPath?: string;
-}
-
-const { currentPath = "" } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const path = Astro.url.pathname;
 
 const navItems = [
-  { label: "首页", path: "" },
-  { label: "文章", path: "articles" },
-  { label: "关于", path: "about" },
+  { label: "首页", href: base, index: "01" },
+  { label: "文章", href: `${base}articles`, index: "02" },
+  { label: "关于", href: `${base}about`, index: "03" },
 ];
 
-const href = (path: string) => {
-  const joined = path === "" ? base : `${base}${path}`;
-  return joined === "" ? "/" : joined;
-};
+const normalize = (value: string) => value.replace(/\/+$/, "") || "/";
+const current = normalize(path);
 
-const isActive = (path: string) => {
-  const current = currentPath === "" ? "/" : currentPath.replace(/\/+$/, "/");
-  const target = href(path).replace(/\/+$/, "/");
-
-  if (path === "") {
-    return current === base || current === "/";
-  }
-
+const isActive = (href: string) => {
+  const target = normalize(href);
+  if (target === "/") return current === "/";
   return current === target || current.startsWith(`${target}/`);
 };
 ---
 
 <header class="site-header">
-  <a class="site-name" href={href("")}>
-    <span class="site-name__mark" aria-hidden="true"></span>
-    十六<span class="site-name__path">/blog</span>
-  </a>
-  <nav class="site-nav" aria-label="站点导航">
-    {
-      navItems.map((item, index) => (
-        <a
-          class:list={["site-nav__link", { "is-active": isActive(item.path) }]}
-          href={href(item.path)}
-          aria-current={isActive(item.path) ? "page" : undefined}
-        >
-          <span class="site-nav__index" aria-hidden="true">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          {item.label}
-        </a>
-      ))
-    }
-  </nav>
+  <div class="site-header__inner">
+    <a class="site-name" href={base} aria-label="十六 · 首页">
+      <span class="site-name__mark" aria-hidden="true">十</span>
+      <span>十六</span>
+      <span class="site-name__path" aria-hidden="true">/blog</span>
+    </a>
+
+    <nav class="site-nav" aria-label="主导航">
+      {
+        navItems.map((item) => (
+          <a
+            class:list={["site-nav__link", { "is-active": isActive(item.href) }]}
+            href={item.href}
+            aria-current={isActive(item.href) ? "page" : undefined}
+          >
+            <span class="site-nav__index" aria-hidden="true">{item.index}</span>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
 </header>

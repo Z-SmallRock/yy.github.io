@@ -13,3 +13,25 @@ export function categoryHue(category: string): number {
 export function categoryStyle(category: string): string {
   return `--cat-hue: ${categoryHue(category)}`;
 }
+
+export type CategoryTone = "acid" | "pink" | "blue";
+
+const KNOWN_TONES: Record<string, CategoryTone> = {
+  EDA: "acid",
+  Electron: "pink",
+  Qt: "blue",
+  "C++": "acid",
+  Chromium: "pink",
+  Linux: "blue",
+  "Node.js": "acid",
+  Docker: "pink",
+  硬件集成: "blue",
+};
+
+/** 粗野主义配色：同分类颜色稳定，未知分类按色相轮转。 */
+export function categoryTone(category: string): CategoryTone {
+  const known = KNOWN_TONES[category];
+  if (known) return known;
+  const tones: CategoryTone[] = ["acid", "pink", "blue"];
+  return tones[categoryHue(category) % 3] ?? "acid";
+}

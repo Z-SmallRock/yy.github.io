@@ -64,7 +64,7 @@ const base = import.meta.env.BASE_URL;
     type ArticleItem,
     type SortOrder,
   } from "../lib/articles";
-  import { categoryHue } from "../lib/category-color";
+  import { categoryTone } from "../lib/category-color";
 
   const root = document.querySelector<HTMLElement>(".article-directory")!;
   const articles = JSON.parse(root.dataset.articles ?? "[]") as ArticleItem[];
@@ -123,7 +123,7 @@ const base = import.meta.env.BASE_URL;
                 <p class="post__summary">${escapeHtml(article.summary)}</p>
               </div>
               <div class="post__meta">
-                <span class="post__cat" style="--cat-hue: ${categoryHue(article.category)}">${escapeHtml(article.category)}</span>
+                <span class="post__cat" data-tone="${categoryTone(article.category)}">${escapeHtml(article.category)}</span>
                 <time class="post__date" datetime="${escapeHtml(article.publishedAt)}">${escapeHtml(article.publishedAt)}</time>
                 <span class="post__read">${article.readingTime} min</span>
               </div>
